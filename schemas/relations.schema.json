@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forge-mvc.dev/schemas/relations.schema.json",
+  "title": "Forge Relations Schema",
+  "description": "Contrat JSON Schema pour le fichier mvc/entities/relations.json. Verrouille la déclaration des relations many_to_one et many_to_many. Les clés inconnues sont interdites.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "relations"],
+  "properties": {
+    "$schema": {
+      "description": "Référence au schéma JSON Schema pour la validation en temps réel dans l'éditeur.",
+      "type": "string"
+    },
+    "schema_version": {
+      "$ref": "common.schema.json#/$defs/schemaVersion",
+      "description": "Version du contrat Forge. Doit valoir '1.0'."
+    },
+    "relations": {
+      "description": "Liste des relations entre entités Forge. Chaque relation est soit many_to_one, soit many_to_many.",
+      "type": "array",
+      "default": [],
+      "items": {
+        "oneOf": [
+          { "$ref": "#/$defs/manyToOne" },
+          { "$ref": "#/$defs/manyToMany" }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "manyToOne": {
+      "description": "Relation many_to_one : la table source porte la clé étrangère vers la table cible.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "from", "to", "name"],
+      "properties": {
+        "type": {
+          "const": "many_to_one",
+          "description": "Type de relation. Toujours 'many_to_one' pour cette définition."
+        },
+        "from": {
+          "$ref": "common.schema.json#/$defs/entityName",
+          "description": "Entité propriétaire de la clé étrangère (PascalCase)."
+        },
+        "to": {
+          "$ref": "common.schema.json#/$defs/entityName",
+          "description": "Entité cible pointée par la clé étrangère (PascalCase)."
+        },
+        "name": {
+          "$ref": "common.schema.json#/$defs/relationName",
+          "description": "Nom de la relation (snake_case). Utilisé pour nommer l'accesseur côté source."
+        },
+        "inverse_name": {
+          "$ref": "common.schema.json#/$defs/relationName",
+          "description": "Nom de la relation inverse côté cible (snake_case). Optionnel."
+        },
+        "foreign_key": {
+          "$ref": "common.schema.json#/$defs/columnName",
+          "description": "Nom de la colonne clé étrangère. Par défaut futur : <name>_id."
+        },
+        "nullable": {
+          "description": "La colonne clé étrangère accepte-t-elle NULL ?",
+          "type": "boolean",
+          "default": true
+        },
+        "on_delete": {
+          "$ref": "common.schema.json#/$defs/onDelete",
+          "description": "Politique SQL ON DELETE appliquée à la clé étrangère."
+        },
+        "index": {
+          "description": "Créer un index sur la colonne clé étrangère.",
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "manyToMany": {
+      "description": "Relation many_to_many : passe par une table pivot explicite décrite dans 'pivot'.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "from", "to", "name", "pivot"],
+      "properties": {
+        "type": {
+          "const": "many_to_many",
+          "description": "Type de relation. Toujours 'many_to_many' pour cette définition."
+        },
+        "from": {
+          "$ref": "common.schema.json#/$defs/entityName",
+          "description": "Entité source (PascalCase)."
+        },
+        "to": {
+          "$ref": "common.schema.json#/$defs/entityName",
+          "description": "Entité cible (PascalCase)."
+        },
+        "name": {
+          "$ref": "common.schema.json#/$defs/relationName",
+          "description": "Nom de la relation côté source (snake_case)."
+        },
+        "inverse_name": {
+          "$ref": "common.schema.json#/$defs/relationName",
+          "description": "Nom de la relation inverse côté cible (snake_case). Optionnel."
+        },
+        "pivot": {
+          "type": "object",
+          "description": "Définition de la table pivot enrichie. La structure détaillée est validée par l'opt-in forge-mvc-entities (ADR-070, qui a absorbé pivot) ; le cœur ne valide que la présence d'un objet."
+        }
+      }
+    }
+  }
+}

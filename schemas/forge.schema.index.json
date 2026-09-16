@@ -1,0 +1,9 @@
+{
+  "schema_version": "1.0",
+  "schemas": {
+    "common": "./common.schema.json",
+    "field": "./field.schema.json",
+    "entity": "./entity.schema.json",
+    "relations": "./relations.schema.json"
+  }
+}

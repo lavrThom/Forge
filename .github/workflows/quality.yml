@@ -1,0 +1,59 @@
+# Portail qualité du projet (ADR-063).
+#
+# Reproduit en CI les gardes du framework Forge : lint, typage strict, tests,
+# documentation. L'environnement virtuel .venv est recréé afin que pyright
+# résolve forge-mvc via la même configuration que l'éditeur (voir pyproject.toml).
+
+name: Qualité
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Créer l'environnement et installer les dépendances
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install --upgrade pip
+          .venv/bin/pip install -r requirements.txt -r requirements-dev.txt -r requirements-docs.txt
+
+      # Comme le framework Forge (piège ADR-044) : ruff, pyright et la doc sont
+      # en continue-on-error (avec un id) pour ne JAMAIS masquer l'exécution des
+      # tests. Le « portail qualité » final fait échouer le job si l'un a échoué.
+
+      - name: Lint (ruff)
+        id: ruff
+        continue-on-error: true
+        run: .venv/bin/ruff check .
+
+      - name: Typage (pyright, strict par fichier)
+        id: pyright
+        continue-on-error: true
+        run: .venv/bin/pyright
+
+      - name: Documentation (mkdocs strict)
+        id: docs
+        continue-on-error: true
+        run: .venv/bin/mkdocs build --strict
+
+      - name: Tests (pytest)
+        run: .venv/bin/pytest
+
+      - name: Portail qualité
+        if: always()
+        run: |
+          test "${{ steps.ruff.outcome }}" = "success" \
+            && test "${{ steps.pyright.outcome }}" = "success" \
+            && test "${{ steps.docs.outcome }}" = "success"

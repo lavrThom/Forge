@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forge-mvc.dev/schemas/entity.schema.json",
+  "title": "Forge Entity Schema",
+  "description": "Contrat JSON Schema pour les fichiers d'entités Forge (mvc/entities/*.json). Réutilise common.schema.json et field.schema.json. Les clés inconnues sont interdites.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "name", "table", "fields"],
+  "properties": {
+    "$schema": {
+      "description": "Référence au schéma JSON Schema pour la validation en temps réel dans l'éditeur.",
+      "type": "string"
+    },
+    "schema_version": {
+      "$ref": "common.schema.json#/$defs/schemaVersion",
+      "description": "Version du contrat Forge. Doit valoir '1.0'."
+    },
+    "name": {
+      "$ref": "common.schema.json#/$defs/entityName",
+      "description": "Nom de l'entité en PascalCase. Exemples : Article, UserProfile."
+    },
+    "table": {
+      "$ref": "common.schema.json#/$defs/tableName",
+      "description": "Nom de la table MariaDB en snake_case."
+    },
+    "label": {
+      "description": "Libellé singulier affiché dans l'interface générée.",
+      "type": "string"
+    },
+    "plural_label": {
+      "description": "Libellé pluriel affiché dans l'interface générée.",
+      "type": "string"
+    },
+    "description": {
+      "description": "Description fonctionnelle de l'entité.",
+      "type": "string"
+    },
+    "fields": {
+      "description": "Champs de l'entité. 'id' est interdit dans chaque champ (clé primaire gérée par Forge via fieldName dans field.schema.json). Au moins un champ requis.",
+      "type": "array",
+      "items": {
+        "$ref": "field.schema.json"
+      },
+      "minItems": 1
+    },
+    "indexes": {
+      "description": "Index supplémentaires à créer sur la table, rendus par le dialecte du backend installé (ADR-054). Un index `unique` devient une contrainte nommée, ce qui exprime une unicité composite. La cohérence avec les champs déclarés est vérifiée par la validation sémantique Forge.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "fields"],
+        "properties": {
+          "name": {
+            "$ref": "common.schema.json#/$defs/sqlIdentifier",
+            "description": "Nom de l'index SQL en snake_case."
+          },
+          "fields": {
+            "description": "Champs couverts par l'index. Au moins un champ requis.",
+            "type": "array",
+            "items": {
+              "$ref": "common.schema.json#/$defs/fieldName"
+            },
+            "minItems": 1
+          },
+          "unique": {
+            "description": "L'index est-il unique ?",
+            "type": "boolean",
+            "default": false
+          }
+        }
+      }
+    },
+    "options": {
+      "description": "Options de génération de l'entité. Les clés inconnues sont interdites.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "timestamps": {
+          "description": "Génère automatiquement les colonnes created_at et updated_at.",
+          "type": "boolean",
+          "default": false
+        },
+        "soft_delete": {
+          "description": "Génère automatiquement la colonne deleted_at pour la suppression logique.",
+          "type": "boolean",
+          "default": false
+        }
+      }
+    }
+  }
+}

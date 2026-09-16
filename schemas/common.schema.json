@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forge-mvc.dev/schemas/common.schema.json",
+  "title": "Forge Common Definitions",
+  "description": "Définitions communes réutilisables par les schémas Forge (entity, field, pivot, relations). Ne pas utiliser directement — uniquement via $ref.",
+  "$defs": {
+    "schemaVersion": {
+      "description": "Version du contrat Forge. Seule valeur acceptée : '1.0'.",
+      "type": "string",
+      "enum": ["1.0"]
+    },
+    "entityName": {
+      "description": "Nom d'entité en PascalCase. Commence par une majuscule, suivi de lettres ou chiffres. Exemples valides : Article, UserProfile, BlogPost.",
+      "type": "string",
+      "pattern": "^[A-Z][A-Za-z0-9]*$"
+    },
+    "fieldName": {
+      "description": "Nom de champ en snake_case. Commence par une lettre minuscule, suivi de lettres minuscules, chiffres ou underscores. 'id' est interdit : la clé primaire est gérée par Forge.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "not": {"const": "id"}
+    },
+    "relationName": {
+      "description": "Nom de relation en snake_case. Même règles que fieldName. 'id' est interdit.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "not": {"const": "id"}
+    },
+    "sqlIdentifier": {
+      "description": "Identifiant SQL valide pour MariaDB : snake_case strict, commence par une lettre minuscule. Interdit : espaces, tirets, points, chemins.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "tableName": {
+      "$ref": "#/$defs/sqlIdentifier",
+      "description": "Nom de table MariaDB. Suit les règles de sqlIdentifier."
+    },
+    "columnName": {
+      "$ref": "#/$defs/sqlIdentifier",
+      "description": "Nom de colonne MariaDB. Suit les règles de sqlIdentifier."
+    },
+    "onDelete": {
+      "description": "Comportement de suppression sur une clé étrangère. 'restrict' est la valeur recommandée par défaut dans Forge.",
+      "type": "string",
+      "enum": ["restrict", "cascade", "set_null", "no_action"]
+    }
+  }
+}

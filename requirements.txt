@@ -1,0 +1,16 @@
+# Dependances du projet Forge.
+# Le framework et ses dependances runtime (python-dotenv, Jinja2, Argon2,
+# jsonschema) sont fournis par le paquet forge-mvc.
+forge-mvc==1.0.0rc9
+# Couche de donnees (ADR-070) : le squelette est livre SANS moteur d'entites.
+# Pour modeliser des donnees (make:entity, make:relation, make:crud, build:model,
+# migrations, provisioning db:*), installez l'opt-in moteur d'entites :
+#   pip install forge-mvc-entities
+# Une application purement web (pages, formulaires, sessions) n'en a pas besoin.
+# Base de donnees (ADR-054/060) : le coeur est agnostique BDD et le squelette
+# est livre SANS backend. Choisissez et installez le backend de votre choix,
+# puis configurez son environnement selon sa documentation. Exemples :
+#   pip install forge-mvc-sqlite     # fichier, sans serveur ni comptes
+#   pip install forge-mvc-mariadb    # serveur MariaDB
+#   pip install forge-mvc-postgres   # serveur PostgreSQL
+#   pip install forge-mvc-mssql      # serveur SQL Server

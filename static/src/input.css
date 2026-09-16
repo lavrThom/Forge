@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+/* Tailwind scanne les templates du projet pour ne garder que les classes
+   réellement utilisées. */
+@source "../../mvc/views";
+
+/* ==========================================================================
+   Charte graphique du projet : « Accessible chaleureux »
+   --------------------------------------------------------------------------
+   Source unique des couleurs, polices et rayons. Pour reskinner toute
+   l'application, modifiez UNIQUEMENT ce bloc : les utilitaires Tailwind
+   (bg-forge, text-ink, border-line, rounded-card, font-sans...) en découlent.
+   ========================================================================== */
+@theme {
+  /* Couleur primaire : orange Forge (signature de la marque, voir
+     site/static/forge-tokens.css --forge-accent). Actions, liens, éléments actifs. */
+  --color-forge:        #E8651A;
+  --color-forge-dark:   #c2540f;
+  --color-forge-soft:   #fff3ea;
+  --color-forge-border: #f6d3bf;
+
+  /* Accent secondaire */
+  --color-ocre:        #d98a2b;
+
+  /* Texte */
+  --color-ink:         #211f1a;
+  --color-muted:       #5d574c;
+  --color-subtle:      #403b32;
+  --color-faint:       #a39b8c;
+
+  /* Fonds et lignes */
+  --color-cream:       #faf8f4;
+  --color-surface:     #fffdf9;
+  --color-line:        #ece6dc;
+  --color-field:       #ddd6ca;
+
+  /* Typographie */
+  --font-sans: "Figtree", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* Rayon des cartes */
+  --radius-card: 16px;
+}

@@ -1,0 +1,17 @@
+{% extends "layouts/base.html" %}
+{% from "components/ui.html" import button %}
+
+{% block title %}413 · {{ app_name }}{% endblock %}
+
+{% block content %}
+<section class="text-center">
+    <p class="text-8xl font-extrabold text-forge">413</p>
+    <h1 class="text-2xl font-bold mt-4">Requête trop volumineuse</h1>
+    <p class="text-muted mt-2">Les données envoyées dépassent la taille maximale autorisée (1 Mo).</p>
+    <div class="mt-6">{{ button("Retour à l'accueil", variant="primary", href="/") }}</div>
+    {% if error %}
+    <p class="text-muted text-sm mt-6">Taille reçue : <code class="font-mono text-subtle">{{ error.received }}</code> octets.</p>
+    <p class="text-xs text-faint mt-1">Détail affiché uniquement en mode développement (APP_ENV=dev).</p>
+    {% endif %}
+</section>
+{% endblock %}

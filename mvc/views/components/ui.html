@@ -1,0 +1,109 @@
+{#
+  Composants UI normalisés (charte « Accessible chaleureux »).
+
+  Usage dans une page :
+    {% from "components/ui.html" import button, card, badge, alert %}
+    {{ button("Enregistrer", variant="primary") }}
+    {% call card() %} ... {% endcall %}
+
+  Toutes les classes dérivent des tokens de la charte (static/src/input.css).
+#}
+
+{# Bouton ou lien stylé. variant : primary | secondary | ghost.
+   Passe href pour un lien <a>, sinon un <button type=...>. #}
+{% macro button(label, variant="primary", href=none, type="button", extra="") %}
+{%- set styles = {
+  "primary":   "text-ink bg-forge hover:bg-forge-dark active:translate-y-px",
+  "secondary": "text-forge bg-forge-soft border border-forge-border hover:bg-forge-border",
+  "ghost":     "text-ink bg-transparent border border-field hover:border-forge",
+  "danger":    "text-white bg-red-600 hover:bg-red-700 active:translate-y-px"
+} -%}
+{%- set cls = "inline-flex items-center justify-center font-semibold transition rounded-[10px] px-[21px] py-3 text-sm "
+   ~ (styles.get(variant) or styles["primary"]) ~ " " ~ extra -%}
+{%- if href -%}
+<a href="{{ href }}" class="{{ cls }}">{{ label }}</a>
+{%- else -%}
+<button type="{{ type }}" class="{{ cls }}">{{ label }}</button>
+{%- endif -%}
+{% endmacro %}
+
+{# Carte de contenu. Utiliser avec {% call card() %} ... {% endcall %}. #}
+{% macro card(extra="") %}
+<div class="rounded-card border border-line bg-surface p-7 {{ extra }}">{{ caller() }}</div>
+{% endmacro %}
+
+{# Pastille / étiquette courte. tone : forge | success | warning | danger | neutral. #}
+{% macro badge(label, tone="forge") %}
+{%- set tones = {
+  "forge":    "text-forge bg-forge-soft",
+  "success": "text-forge bg-forge-soft",
+  "warning": "text-ocre bg-orange-50",
+  "danger":  "text-red-700 bg-red-50",
+  "neutral": "text-subtle bg-cream"
+} -%}
+<span class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full {{ tones.get(tone) or tones['forge'] }}">{{ label }}</span>
+{% endmacro %}
+
+{# Message contextuel. level : success | error | warning | info. #}
+{% macro alert(message, level="info") %}
+{%- set tones = {
+  "success": "bg-forge-soft text-forge border-forge-border",
+  "error":   "bg-red-50 text-red-700 border-red-200",
+  "warning": "bg-orange-50 text-ocre border-ocre/30",
+  "info":    "bg-cream text-subtle border-line"
+} -%}
+<div class="rounded-[10px] border px-4 py-3 text-sm {{ tones.get(level) or tones['info'] }}">{{ message }}</div>
+{% endmacro %}
+
+{# Rendu d'un message flash de session. flash : dict {message, level} ou None.
+   La page passe flash en contexte (ex. via un context provider applicatif). #}
+{% macro flash_messages(flash) %}
+{% if flash %}<div class="mb-4">{{ alert(flash.message, level=flash.level | default("info")) }}</div>{% endif %}
+{% endmacro %}
+
+{# En-tête de page : titre, sous-titre optionnel, bouton d'action optionnel. #}
+{% macro page_header(title, subtitle="", action_label="", action_href="") %}
+<div class="flex items-start justify-between gap-4 mb-8">
+  <div>
+    <h1 class="text-[28px] font-extrabold tracking-tight">{{ title }}</h1>
+    {% if subtitle %}<p class="mt-1 text-sm text-muted">{{ subtitle }}</p>{% endif %}
+  </div>
+  {% if action_label and action_href %}{{ button(action_label, variant="primary", href=action_href) }}{% endif %}
+</div>
+{% endmacro %}
+
+{# Bloc « aucune donnée » pour une liste vide. #}
+{% macro empty_state(message, hint="") %}
+<div class="rounded-card border border-dashed border-field bg-surface px-6 py-12 text-center">
+  <p class="text-sm font-semibold text-subtle">{{ message }}</p>
+  {% if hint %}<p class="mt-1 text-sm text-muted">{{ hint }}</p>{% endif %}
+</div>
+{% endmacro %}
+
+{# Chiffre-clé. #}
+{% macro stat(value, label) %}
+<div class="text-center">
+  <div class="text-[32px] font-extrabold text-forge leading-none">{{ value }}</div>
+  <div class="mt-1.5 text-[13.5px] font-medium text-muted">{{ label }}</div>
+</div>
+{% endmacro %}
+
+{# Fil d'Ariane. items : liste de couples (libellé, href). Le dernier item
+   (href vide ou None) est la page courante, non cliquable. #}
+{% macro breadcrumb(items) %}
+<nav class="mb-6 text-sm text-muted" aria-label="Fil d'Ariane">
+  {% for label, href in items %}
+    {%- if href and not loop.last %}<a href="{{ href }}" class="hover:text-forge">{{ label }}</a>
+    <span class="mx-2 text-faint">/</span>
+    {%- else %}<span class="font-semibold text-ink">{{ label }}</span>{% endif %}
+  {% endfor %}
+</nav>
+{% endmacro %}
+
+{# Barre de navigation. links : liste de couples (libellé, href). current :
+   href de la page active (surlignée). À placer dans le bloc nav du layout. #}
+{% macro navbar(links, current="") %}
+{% for label, href in links %}
+<a href="{{ href }}" class="{% if href == current %}text-forge font-semibold{% else %}text-muted hover:text-forge{% endif %} transition-colors">{{ label }}</a>
+{% endfor %}
+{% endmacro %}

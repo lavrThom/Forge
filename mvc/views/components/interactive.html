@@ -1,0 +1,64 @@
+{#
+  Composants interactifs en HTML natif (charte « Accessible chaleureux »).
+
+  Aucun framework JavaScript requis : on s'appuie sur les éléments natifs
+  <details>/<summary> (accordéon, menu) et <dialog> (modale). La fermeture de
+  la modale est gérée par <form method="dialog"> (zéro JS) ; son ouverture
+  utilise la méthode native showModal() (une ligne de JS, pas de framework).
+
+  Usage :
+    {% from "components/interactive.html" import accordion, dropdown, modal, modal_trigger %}
+#}
+
+{# Accordéon (zéro JS). Usage : {% call accordion("Titre") %} ... {% endcall %} #}
+{% macro accordion(summary, open=False) %}
+<details class="group rounded-card border border-line bg-surface mb-3"{% if open %} open{% endif %}>
+  <summary class="cursor-pointer select-none px-5 py-4 font-semibold text-ink flex items-center justify-between">
+    <span>{{ summary }}</span>
+    <span class="text-faint transition group-open:rotate-180">v</span>
+  </summary>
+  <div class="px-5 pb-5 text-sm text-muted">{{ caller() }}</div>
+</details>
+{% endmacro %}
+
+{# Menu déroulant (zéro JS). Usage : {% call dropdown("Actions") %} <a ...>...</a> {% endcall %} #}
+{% macro dropdown(label) %}
+<details class="relative inline-block">
+  <summary class="cursor-pointer select-none inline-flex items-center gap-1.5 rounded-[10px] border border-field px-[19px] py-2.5 text-sm font-semibold text-ink hover:border-forge transition">
+    {{ label }} <span class="text-faint">v</span>
+  </summary>
+  <div class="absolute right-0 mt-2 w-48 rounded-card border border-line bg-surface shadow-lg py-1.5 z-10 text-sm">
+    {{ caller() }}
+  </div>
+</details>
+{% endmacro %}
+
+{# Lien de menu pour dropdown(). #}
+{% macro menu_item(label, href="#") %}
+<a href="{{ href }}" class="block px-4 py-2 text-subtle hover:bg-cream hover:text-forge transition">{{ label }}</a>
+{% endmacro %}
+
+{# Bouton qui ouvre la modale d'identifiant id (showModal natif). #}
+{% macro modal_trigger(id, label, variant="primary") %}
+{%- set styles = {
+  "primary":   "text-ink bg-forge hover:bg-forge-dark",
+  "secondary": "text-forge bg-forge-soft border border-forge-border hover:bg-forge-border",
+  "ghost":     "text-ink bg-transparent border border-field hover:border-forge"
+} -%}
+<button type="button" onclick="document.getElementById('{{ id }}').showModal()" class="inline-flex items-center justify-center font-semibold transition rounded-[10px] px-[21px] py-3 text-sm {{ styles.get(variant) or styles['primary'] }}">{{ label }}</button>
+{% endmacro %}
+
+{# Modale native <dialog>. Fermeture par <form method="dialog"> (zéro JS).
+   Usage : {% call modal("confirm", "Confirmer") %} ... {% endcall %}
+   puis ouvrir avec {{ modal_trigger("confirm", "Ouvrir") }}. #}
+{% macro modal(id, title="") %}
+<dialog id="{{ id }}" class="rounded-card border border-line p-0 backdrop:bg-ink/40 w-full max-w-md">
+  <div class="p-6">
+    <div class="flex items-start justify-between gap-4 mb-3">
+      {% if title %}<h2 class="text-lg font-bold text-ink">{{ title }}</h2>{% endif %}
+      <form method="dialog" class="ml-auto"><button class="text-faint hover:text-ink text-xl leading-none" aria-label="Fermer">&times;</button></form>
+    </div>
+    <div class="text-sm text-muted">{{ caller() }}</div>
+  </div>
+</dialog>
+{% endmacro %}

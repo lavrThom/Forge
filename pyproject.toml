@@ -1,0 +1,27 @@
+# Configuration d'outillage du projet (ADR-063).
+#
+# Fichier de configuration d'outils, pas une déclaration de paquet distribuable :
+# volontairement sans [project] ni [build-system]. Les valeurs sont alignées sur
+# les standards du framework Forge (typage strict par fichier, ADR-036 ; lint ruff).
+
+[tool.pyright]
+# Typage vérifié sur le code éditable du projet (mvc, optins). Le mode strict est
+# activé fichier par fichier via le marqueur « # pyright: strict » en tête, comme
+# le fait le cœur de Forge. Ainsi l'éditeur, la ligne de commande et la CI
+# vérifient exactement la même chose.
+include = ["mvc", "optins"]
+pythonVersion = "3.12"
+venvPath = "."
+venv = ".venv"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F"]
+ignore = [
+    "E501",  # line-too-long, géré séparément
+    "E741",  # ambiguous-variable-name, intentionnel dans les boucles et générateurs
+    "E402",  # module-import-not-at-top, intentionnel dans app.py et les scripts
+]

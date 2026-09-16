@@ -1,0 +1,118 @@
+{#
+  Composants de formulaire normalisés (charte « Accessible chaleureux »).
+
+  Usage dans une page (dans un <form> qui inclut partials/csrf.html) :
+    {% from "components/forms.html" import field, select_field, checkbox, submit %}
+    {{ field("email", label="Courriel", type="email", required=True) }}
+    {{ submit("Enregistrer") }}
+
+  État d'erreur : passez error="message" à field/textarea_field/select_field
+  pour afficher la bordure rouge et le message (validation serveur, réponse 422).
+
+  Les macros produisent uniquement les champs : la balise <form>, la méthode,
+  l'action et le jeton CSRF restent à la charge de la page (principe 3 : pas de
+  magie cachée).
+#}
+
+{%- set _label_cls = "block text-[12.5px] font-semibold text-subtle mb-1.5" -%}
+{%- set _input_base = "w-full px-3.5 py-3 text-sm bg-white border rounded-[10px] focus:outline-none focus:ring-[3px] transition" -%}
+
+{%- macro _border(error) -%}
+{{- "border-red-400 focus:border-red-500 focus:ring-red-500/20" if error else "border-field focus:border-forge focus:ring-forge/15" -}}
+{%- endmacro -%}
+
+{%- macro _label(name, label, required) -%}
+{% if label %}<label for="{{ name }}" class="{{ _label_cls }}">{{ label }}{% if required %} <span class="text-ocre">*</span>{% endif %}</label>{% endif %}
+{%- endmacro -%}
+
+{%- macro _hint(error, help) -%}
+{% if error %}<p class="mt-1 text-xs text-red-600">{{ error }}</p>{% elif help %}<p class="mt-1 text-xs text-faint">{{ help }}</p>{% endif %}
+{%- endmacro -%}
+
+{% macro field(name, label="", type="text", value="", placeholder="", required=False, help="", error="") %}
+<div class="mb-4">
+  {{ _label(name, label, required) }}
+  <input id="{{ name }}" name="{{ name }}" type="{{ type }}" value="{{ value }}" placeholder="{{ placeholder }}"{% if required %} required{% endif %} class="{{ _input_base }} {{ _border(error) }}">
+  {{ _hint(error, help) }}
+</div>
+{% endmacro %}
+
+{% macro search_field(name="q", placeholder="Rechercher...", value="") %}
+<input id="{{ name }}" name="{{ name }}" type="search" value="{{ value }}" placeholder="{{ placeholder }}" class="{{ _input_base }} border-field focus:border-forge focus:ring-forge/15">
+{% endmacro %}
+
+{% macro file_field(name, label="", required=False, help="", error="", accept="") %}
+<div class="mb-4">
+  {{ _label(name, label, required) }}
+  <input id="{{ name }}" name="{{ name }}" type="file"{% if accept %} accept="{{ accept }}"{% endif %}{% if required %} required{% endif %} class="block w-full text-sm text-subtle file:mr-3 file:rounded-[8px] file:border-0 file:bg-forge-soft file:px-4 file:py-2 file:text-sm file:font-semibold file:text-forge hover:file:bg-forge-border">
+  {{ _hint(error, help) }}
+</div>
+{% endmacro %}
+
+{% macro textarea_field(name, label="", value="", rows=4, placeholder="", required=False, help="", error="") %}
+<div class="mb-4">
+  {{ _label(name, label, required) }}
+  <textarea id="{{ name }}" name="{{ name }}" rows="{{ rows }}" placeholder="{{ placeholder }}"{% if required %} required{% endif %} class="{{ _input_base }} {{ _border(error) }}">{{ value }}</textarea>
+  {{ _hint(error, help) }}
+</div>
+{% endmacro %}
+
+{# options : liste de couples (valeur, libellé). #}
+{% macro select_field(name, label="", options=[], selected="", required=False, error="") %}
+<div class="mb-4">
+  {{ _label(name, label, required) }}
+  <select id="{{ name }}" name="{{ name }}"{% if required %} required{% endif %} class="{{ _input_base }} {{ _border(error) }}">
+    {% for value, text in options %}
+    <option value="{{ value }}"{% if value|string == selected|string %} selected{% endif %}>{{ text }}</option>
+    {% endfor %}
+  </select>
+  {{ _hint(error, help="") }}
+</div>
+{% endmacro %}
+
+{# options : liste de couples (valeur, libellé). #}
+{% macro radio_group(name, label="", options=[], selected="", error="") %}
+<fieldset class="mb-4">
+  {% if label %}<legend class="{{ _label_cls }}">{{ label }}</legend>{% endif %}
+  <div class="space-y-2">
+    {% for value, text in options %}
+    <label class="flex items-center gap-2.5 text-sm text-subtle">
+      <input type="radio" name="{{ name }}" value="{{ value }}"{% if value == selected %} checked{% endif %} class="w-4 h-4 accent-forge">
+      <span>{{ text }}</span>
+    </label>
+    {% endfor %}
+  </div>
+  {{ _hint(error, help="") }}
+</fieldset>
+{% endmacro %}
+
+{% macro checkbox(name, label, checked=False, value="1") %}
+<label class="flex items-start gap-2.5 mb-4 text-sm text-subtle">
+  <input type="checkbox" id="{{ name }}" name="{{ name }}" value="{{ value }}"{% if checked %} checked{% endif %} class="mt-0.5 w-4 h-4 accent-forge">
+  <span>{{ label }}</span>
+</label>
+{% endmacro %}
+
+{# Regroupe des champs sous un titre. Usage : {% call fieldset("Coordonnées") %} ... {% endcall %} #}
+{% macro fieldset(legend="") %}
+<fieldset class="mb-6 border border-line rounded-card p-5">
+  {% if legend %}<legend class="px-2 text-sm font-semibold text-subtle">{{ legend }}</legend>{% endif %}
+  {{ caller() }}
+</fieldset>
+{% endmacro %}
+
+{# Résumé des erreurs en tête de formulaire. errors : liste de messages. #}
+{% macro form_errors(errors) %}
+{% if errors %}
+<div class="mb-5 rounded-[10px] border border-red-200 bg-red-50 px-4 py-3">
+  <p class="text-sm font-semibold text-red-700">Veuillez corriger les points suivants :</p>
+  <ul class="mt-1.5 list-disc list-inside text-sm text-red-600">
+    {% for message in errors %}<li>{{ message }}</li>{% endfor %}
+  </ul>
+</div>
+{% endif %}
+{% endmacro %}
+
+{% macro submit(label="Envoyer") %}
+<button type="submit" class="w-full px-6 py-3.5 text-[15px] font-semibold text-ink bg-forge hover:bg-forge-dark active:translate-y-px transition rounded-[11px]">{{ label }}</button>
+{% endmacro %}

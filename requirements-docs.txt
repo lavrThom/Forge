@@ -1,0 +1,7 @@
+# Dependances de documentation du projet (ADR-063).
+#
+# Installer avec : pip install -r requirements-docs.txt
+# Chaine documentaire (MkDocs + theme Material) : non requise a l'execution ni
+# aux tests, elle ne figure donc pas dans requirements.txt ni requirements-dev.txt.
+
+mkdocs-material

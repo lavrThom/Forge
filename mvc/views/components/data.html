@@ -1,0 +1,50 @@
+{#
+  Composants d'affichage de données (charte « Accessible chaleureux »).
+
+  Usage :
+    {% from "components/data.html" import table, pagination %}
+    {{ table(["Nom", "Courriel"], lignes) }}
+    {{ pagination(page, total_pages, base_url="/contact") }}
+#}
+
+{# Tableau de données en lecture.
+   headers : liste de libellés de colonnes.
+   rows    : liste de lignes, chaque ligne étant une liste de cellules (texte).
+   Pour une colonne d'actions (liens éditer/supprimer), composez le tableau à la
+   main en reprenant ces classes : le rendu de cellules est échappé (sécurité). #}
+{% macro table(headers, rows, empty="Aucune donnée à afficher.") %}
+<div class="overflow-x-auto rounded-card border border-line">
+  <table class="w-full text-sm">
+    <thead class="bg-cream text-left">
+      <tr>
+        {% for h in headers %}<th class="px-4 py-3 font-semibold text-subtle">{{ h }}</th>{% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr class="border-t border-line">
+        {% for cell in row %}<td class="px-4 py-3 text-muted">{{ cell }}</td>{% endfor %}
+      </tr>
+      {% else %}
+      <tr><td colspan="{{ headers | length }}" class="px-4 py-10 text-center text-muted">{{ empty }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endmacro %}
+
+{# Pied de pagination. page : page courante (1-based). total_pages : nombre de
+   pages. base_url : chemin de la liste (les liens ajoutent ?page=N). #}
+{% macro pagination(page, total_pages, base_url="") %}
+{% if total_pages > 1 %}
+{%- set prev_cls = "px-3 py-2 text-sm font-semibold rounded-[8px] border border-field text-ink hover:border-forge transition" -%}
+{%- set off_cls = "px-3 py-2 text-sm font-semibold rounded-[8px] border border-line text-faint cursor-not-allowed" -%}
+<nav class="flex items-center justify-between gap-3 mt-6" aria-label="Pagination">
+  {% if page > 1 %}<a href="{{ base_url }}?page={{ page - 1 }}" class="{{ prev_cls }}">Précédent</a>
+  {% else %}<span class="{{ off_cls }}">Précédent</span>{% endif %}
+  <span class="text-sm text-muted">Page {{ page }} sur {{ total_pages }}</span>
+  {% if page < total_pages %}<a href="{{ base_url }}?page={{ page + 1 }}" class="{{ prev_cls }}">Suivant</a>
+  {% else %}<span class="{{ off_cls }}">Suivant</span>{% endif %}
+</nav>
+{% endif %}
+{% endmacro %}

@@ -1,0 +1,15 @@
+# Dependances de developpement du projet (ADR-063).
+#
+# Installer avec : pip install -r requirements-dev.txt
+# Outillage qualite (tests, lint, typage) : non requis a l'execution, il ne
+# figure donc pas dans requirements.txt.
+
+# Infrastructure de test partagee de Forge : FakeRequest + plugin pytest,
+# charge automatiquement des l'installation (ADR-041). Version alignee sur
+# forge-mvc (verrouillee par tools/check_version_sync.py).
+forge-mvc-testing==1.0.0rc9
+
+# Chaine qualite invoquee par `make check` (typage strict par fichier, lint).
+pytest
+ruff
+pyright

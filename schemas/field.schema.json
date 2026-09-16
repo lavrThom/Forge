@@ -1,0 +1,213 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forge-mvc.dev/schemas/field.schema.json",
+  "title": "Forge Field Schema",
+  "description": "Contrat d'un champ métier d'entité Forge. Réutilisable par entity.schema.json et pivot.schema.json. Les clés inconnues sont interdites.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "type"],
+  "properties": {
+    "name": {
+      "$ref": "common.schema.json#/$defs/fieldName",
+      "description": "Nom du champ en snake_case. 'id' est interdit (clé primaire gérée par Forge)."
+    },
+    "type": {
+      "description": "Type Forge du champ. Détermine la colonne SQL et les widgets de formulaire générés.",
+      "type": "string",
+      "enum": [
+        "string",
+        "slug",
+        "text",
+        "integer",
+        "big_integer",
+        "float",
+        "decimal",
+        "boolean",
+        "date",
+        "datetime",
+        "email",
+        "password",
+        "json",
+        "foreign_key"
+      ]
+    },
+    "references": {
+      "description": "Entité cible d'une clé étrangère (type foreign_key), en PascalCase. La colonne adopte le type de la clé primaire de cette entité.",
+      "$ref": "common.schema.json#/$defs/entityName"
+    },
+    "label": {
+      "description": "Libellé affiché dans les formulaires et listes générés.",
+      "type": "string"
+    },
+    "description": {
+      "description": "Description longue du champ, utilisée dans la documentation générée.",
+      "type": "string"
+    },
+    "required": {
+      "description": "Le champ est-il obligatoire côté formulaire ?",
+      "type": "boolean",
+      "default": false
+    },
+    "nullable": {
+      "description": "La colonne SQL accepte-t-elle NULL ?",
+      "type": "boolean",
+      "default": true
+    },
+    "unique": {
+      "description": "La colonne SQL a-t-elle une contrainte UNIQUE ?",
+      "type": "boolean",
+      "default": false
+    },
+    "default": {
+      "description": "Valeur par défaut du champ. La cohérence avec le type sera vérifiée par la validation sémantique Forge."
+    },
+    "max_length": {
+      "description": "Longueur maximale pour les types string, email, password.",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10000
+    },
+    "computed": {
+      "description": "Expression SQL d'un champ dérivé, projetée en lecture seule. Le champ n'a pas de colonne : il n'est ni inséré ni mis à jour. L'expression part telle quelle dans le SELECT, elle n'est pas paramétrable, et le contrat d'entité est du code du projet, relu et versionné, jamais une donnée d'utilisateur. Incompatible avec required, unique, default, form et foreign_key.",
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?=.*[^\\s])[^;]+$"
+    },
+    "source": {
+      "description": "Champ source d'un slug auto-généré (type slug). Le slug est généré depuis ce champ, absent du formulaire, et reste stable à l'édition.",
+      "$ref": "common.schema.json#/$defs/fieldName"
+    },
+    "min": {
+      "description": "Valeur minimale pour les types numériques.",
+      "type": "number"
+    },
+    "max": {
+      "description": "Valeur maximale pour les types numériques.",
+      "type": "number"
+    },
+    "precision": {
+      "description": "Nombre total de chiffres significatifs (obligatoire si type = decimal).",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 65
+    },
+    "scale": {
+      "description": "Nombre de chiffres après la virgule (obligatoire si type = decimal).",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 30
+    },
+    "auto_now": {
+      "description": "Met automatiquement à jour la valeur à chaque modification. Types concernés : date, datetime.",
+      "type": "boolean",
+      "default": false
+    },
+    "auto_now_add": {
+      "description": "Initialise automatiquement la valeur à la création. Types concernés : date, datetime.",
+      "type": "boolean",
+      "default": false
+    },
+    "choices": {
+      "description": "Liste de valeurs autorisées. Génère un select dans les formulaires. Les clés inconnues sont interdites dans chaque entrée.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["value", "label"],
+        "properties": {
+          "value": {
+            "description": "Valeur stockée en base de données.",
+            "type": ["string", "number", "boolean"]
+          },
+          "label": {
+            "description": "Libellé affiché dans l'interface.",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "form": {
+      "description": "Options de rendu dans les formulaires Forge générés. Les clés inconnues sont interdites.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "widget": {
+          "description": "Widget HTML à utiliser dans le formulaire.",
+          "type": "string",
+          "enum": [
+            "input",
+            "textarea",
+            "select",
+            "checkbox",
+            "radio",
+            "date",
+            "datetime",
+            "hidden",
+            "password"
+          ]
+        },
+        "placeholder": {
+          "description": "Texte d'aide affiché dans le champ vide.",
+          "type": "string"
+        },
+        "help": {
+          "description": "Texte d'aide affiché sous le champ.",
+          "type": "string"
+        },
+        "readonly": {
+          "description": "Le champ est affiché mais non modifiable.",
+          "type": "boolean"
+        },
+        "hidden": {
+          "description": "Le champ est présent dans le formulaire mais non visible.",
+          "type": "boolean"
+        }
+      }
+    },
+    "crud": {
+      "description": "Options de visibilité et de comportement dans les vues CRUD générées. Les clés inconnues sont interdites.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "list": {
+          "description": "Visible dans la vue liste.",
+          "type": "boolean"
+        },
+        "create": {
+          "description": "Présent dans le formulaire de création.",
+          "type": "boolean"
+        },
+        "edit": {
+          "description": "Présent dans le formulaire d'édition.",
+          "type": "boolean"
+        },
+        "show": {
+          "description": "Visible dans la vue détail.",
+          "type": "boolean"
+        },
+        "searchable": {
+          "description": "Inclus dans la recherche globale.",
+          "type": "boolean"
+        },
+        "sortable": {
+          "description": "La colonne peut être triée dans la vue liste.",
+          "type": "boolean"
+        },
+        "filterable": {
+          "description": "Un filtre peut être appliqué sur ce champ dans la vue liste.",
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"type": {"const": "decimal"}}, "required": ["type"]},
+      "then": {"required": ["precision", "scale"]}
+    },
+    {
+      "if": {"properties": {"type": {"const": "foreign_key"}}, "required": ["type"]},
+      "then": {"required": ["references"]}
+    }
+  ]
+}

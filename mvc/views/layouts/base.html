@@ -1,0 +1,51 @@
+{#
+  Layout Jinja partagé du squelette Forge (charte « Accessible chaleureux »).
+
+  Les pages concrètes l'étendent via {% extends "layouts/base.html" %} et
+  remplissent les blocs `title` (optionnel), `nav` (optionnel), `content` et
+  `footer` (optionnel).
+
+  Contexte : `app_name` est injecté globalement par Forge (config APP_NAME),
+  disponible dans toutes les vues sans que le contrôleur ait à le passer.
+
+  La charte (couleurs, police, rayons) vit dans static/src/input.css (@theme).
+#}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ app_name }}{% endblock %}</title>
+    <link rel="icon" href="/static/favicon.ico" sizes="any">
+    <link rel="icon" href="/static/favicon.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/tailwind.css">
+</head>
+<body class="bg-cream text-ink font-sans min-h-screen flex flex-col">
+
+    {% block header %}
+    <header class="bg-surface border-b border-line px-8 py-4">
+        <div class="max-w-5xl mx-auto flex items-center justify-between gap-6">
+            <a href="/" class="flex items-center gap-2 text-lg font-extrabold tracking-tight">
+                <img src="/static/forge-nav.png" alt="" class="h-8 w-auto">
+                {{ app_name }}
+            </a>
+            <nav class="flex items-center gap-6 text-sm font-medium text-muted">
+                {% block nav %}{% include "partials/nav.html" ignore missing %}{% endblock %}
+            </nav>
+        </div>
+    </header>
+    {% endblock %}
+
+    <main class="flex-1 w-full max-w-3xl mx-auto px-8 py-16">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-ink text-white/70 px-8 py-6 text-center text-xs">
+        {% block footer %}Généré avec Forge 1.0.0rc9. Framework MVC Python, sans magie cachée.{% endblock %}
+    </footer>
+
+</body>
+</html>

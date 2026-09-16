@@ -1,0 +1,77 @@
+{% extends "layouts/base.html" %}
+{% from "components/ui.html" import page_header, alert, badge, button, card %}
+{% from "components/forms.html" import field, textarea_field, select_field, checkbox, submit %}
+
+{% block title %}Charte graphique · {{ app_name }}{% endblock %}
+
+{% block content %}
+{{ page_header("Charte graphique", subtitle="Aperçu du thème « Accessible chaleureux » livré par Forge") }}
+
+{{ alert("Pour reskinner toute l'application, modifiez le bloc @theme de static/src/input.css (couleurs, polices, rayons), puis recompilez le CSS. Cette page ne fait que montrer le résultat.", level="info") }}
+
+<!-- Palette ------------------------------------------------------------------ -->
+<h2 class="text-xl font-bold tracking-tight mt-10 mb-4">Palette</h2>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+  {% for name, cls in [
+      ("forge", "bg-forge"), ("forge-dark", "bg-forge-dark"),
+      ("forge-soft", "bg-forge-soft"), ("ocre", "bg-ocre"),
+      ("ink", "bg-ink"), ("muted", "bg-muted"),
+      ("cream", "bg-cream"), ("surface", "bg-surface")
+  ] %}
+  <div>
+    <div class="{{ cls }} h-16 rounded-[10px] border border-line"></div>
+    <p class="mt-1.5 text-xs font-mono text-subtle">{{ name }}</p>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Typographie -------------------------------------------------------------- -->
+<h2 class="text-xl font-bold tracking-tight mt-10 mb-4">Typographie</h2>
+<div class="space-y-2">
+  <p class="text-4xl font-extrabold tracking-tight">Titre extra-bold</p>
+  <p class="text-2xl font-bold">Sous-titre bold</p>
+  <p class="text-base text-subtle">Texte courant, police Figtree, teinte « subtle ».</p>
+  <p class="text-sm text-muted">Texte secondaire, teinte « muted ».</p>
+  <p class="font-mono text-sm text-subtle">Code : font-mono (JetBrains Mono).</p>
+</div>
+
+<!-- Boutons ------------------------------------------------------------------ -->
+<h2 class="text-xl font-bold tracking-tight mt-10 mb-4">Boutons</h2>
+<div class="flex flex-wrap gap-3">
+  {{ button("Primary", variant="primary", href="#") }}
+  {{ button("Secondary", variant="secondary", href="#") }}
+  {{ button("Ghost", variant="ghost", href="#") }}
+  {{ button("Danger", variant="danger", href="#") }}
+</div>
+
+<!-- Badges ------------------------------------------------------------------- -->
+<h2 class="text-xl font-bold tracking-tight mt-10 mb-4">Badges</h2>
+<div class="flex flex-wrap gap-2">
+  {{ badge("forge") }} {{ badge("success", tone="success") }}
+  {{ badge("warning", tone="warning") }} {{ badge("danger", tone="danger") }}
+  {{ badge("neutral", tone="neutral") }}
+</div>
+
+<!-- Alertes ------------------------------------------------------------------ -->
+<h2 class="text-xl font-bold tracking-tight mt-10 mb-4">Alertes</h2>
+<div class="space-y-3">
+  {{ alert("Message d'information.", level="info") }}
+  {{ alert("Opération réussie.", level="success") }}
+  {{ alert("Attention à ce point.", level="warning") }}
+  {{ alert("Une erreur est survenue.", level="error") }}
+</div>
+
+<!-- Formulaire --------------------------------------------------------------- -->
+<h2 class="text-xl font-bold tracking-tight mt-10 mb-4">Champs de formulaire</h2>
+{% call card() %}
+<form onsubmit="return false" class="space-y-1">
+  {{ field(name="exemple_nom", label="Nom", placeholder="Votre nom", required=True) }}
+  {{ field(name="exemple_email", label="Courriel", type="email", value="prof@exemple.test", help="Un champ avec valeur et aide.") }}
+  {{ field(name="exemple_erreur", label="Champ en erreur", value="invalide", error="Ce champ est requis.") }}
+  {{ select_field(name="exemple_choix", label="Choix", options=[(1, "Première option"), (2, "Deuxième option")], selected=2) }}
+  {{ textarea_field(name="exemple_texte", label="Description", value="Texte multi-lignes.") }}
+  {{ checkbox(name="exemple_actif", label="Actif") }}
+  {{ submit(label="Enregistrer") }}
+</form>
+{% endcall %}
+{% endblock %}

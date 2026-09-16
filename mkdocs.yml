@@ -1,0 +1,27 @@
+# Documentation du projet (ADR-063).
+#
+# Chaine MkDocs livree par forge new : theme Material, francais. La navigation
+# est construite automatiquement a partir de l'arborescence docs/ (aucune cle
+# nav), afin de rester valide sous `mkdocs build --strict` quel que soit le
+# contenu ajoute (dont docs/adr/ pose par agents:init).
+#
+# Installer la chaine : pip install -r requirements-docs.txt
+# Servir en local    : mkdocs serve
+# Construire          : mkdocs build --strict
+
+site_name: Documentation du projet
+docs_dir: docs
+
+theme:
+  name: material
+  language: fr
+  features:
+    - navigation.instant
+    - navigation.top
+    - content.code.copy
+
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: true
+  - pymdownx.superfences

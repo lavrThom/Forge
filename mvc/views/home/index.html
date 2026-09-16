@@ -1,0 +1,36 @@
+{% extends "layouts/base.html" %}
+{% from "components/ui.html" import card, button %}
+
+{% block title %}Bienvenue · {{ app_name }}{% endblock %}
+
+{# La page d'accueil n'affiche pas la barre de navigation : on neutralise le bloc header du layout. #}
+{% block header %}{% endblock %}
+
+{% block content %}
+<section class="text-center">
+    <img src="/static/forge-bandeau-1-512.png" alt="Forge"
+         class="mx-auto mb-8 w-72 max-w-full h-auto">
+    <h1 class="text-5xl font-extrabold tracking-tight mb-5 leading-tight">
+        Votre projet&nbsp;<span class="text-forge">Forge</span>{% if forge_version %}<span class="align-middle ml-2 text-2xl font-mono font-medium text-muted">{{ forge_version }}</span>{% endif %} tourne
+    </h1>
+    <p class="text-muted text-lg leading-relaxed max-w-xl mx-auto">
+        Cette page est servie par <code class="font-mono text-subtle">mvc/controllers/home_controller.py</code>
+        via la route <code class="font-mono text-subtle">/</code> déclarée dans
+        <code class="font-mono text-subtle">mvc/routes/__init__.py</code>. Modifiez-les pour
+        construire votre application.
+    </p>
+</section>
+
+<div class="mt-10 max-w-xl mx-auto text-left">
+    {% call card() %}
+    <h2 class="text-lg font-bold mb-2">Pour commencer</h2>
+    <p class="text-sm text-muted leading-relaxed mb-4">
+        La charte graphique vit dans <code class="font-mono text-subtle">static/src/input.css</code>
+        (bloc <code class="font-mono text-subtle">@theme</code>) et les composants réutilisables dans
+        <code class="font-mono text-subtle">mvc/views/components/</code>. Cette page étend le layout
+        <code class="font-mono text-subtle">mvc/views/layouts/base.html</code>.
+    </p>
+    {{ button("Documentation Forge", variant="secondary", href="https://forgemvc.com") }}
+    {% endcall %}
+</div>
+{% endblock %}

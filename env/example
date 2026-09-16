@@ -1,0 +1,30 @@
+# Application
+APP_NAME=Forge
+APP_ROUTES_MODULE=mvc.routes
+
+# Environnement servi par ce fichier.
+# config.py la lit et retombe sur « dev » quand elle est absente : un env/prod
+# qui l'oublie fait tourner la production en configuration de developpement,
+# ou la page d'erreur rend sa pile d'exception au visiteur.
+# env/prod DOIT donc declarer APP_ENV=prod.
+APP_ENV=dev
+
+# Upload
+# Le noyau ne garde que le plafond de corps multipart (ADR-032).
+# UPLOAD_ROOT et UPLOAD_ALLOWED_* sont lues par l'opt-in forge-mvc-files.
+UPLOAD_MAX_SIZE=5242880
+
+# Serveur
+APP_HOST=127.0.0.1
+APP_PORT=8000
+# Dev : HTTPS local par défaut. Prod derrière Nginx : HTTP local par défaut.
+# APP_SSL_ENABLED=true
+
+# Certificats SSL (générés avec openssl, voir app.py)
+SSL_CERTFILE=cert.pem
+SSL_KEYFILE=key.pem
+
+# Nonce CSP optionnel, désactivé par défaut.
+# Activer pour permettre des scripts inline contrôlés
+# avec {{ csp_nonce() }} dans les templates.
+APP_CSP_NONCE_ENABLED=false

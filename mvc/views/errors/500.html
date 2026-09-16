@@ -1,0 +1,23 @@
+{% extends "layouts/base.html" %}
+{% from "components/ui.html" import button %}
+
+{% block title %}500 · {{ app_name }}{% endblock %}
+
+{% block content %}
+<section class="text-center">
+    <p class="text-8xl font-extrabold text-forge">500</p>
+    <h1 class="text-2xl font-bold mt-4">Erreur interne du serveur</h1>
+    <p class="text-muted mt-2">Une erreur inattendue s'est produite. Veuillez réessayer plus tard.</p>
+    <div class="mt-6">{{ button("Retour à l'accueil", variant="primary", href="/") }}</div>
+    {% if error %}
+    <div class="mt-8 max-w-3xl mx-auto text-left bg-surface border border-ocre/40 rounded-card overflow-hidden">
+        <div class="bg-orange-50 px-4 py-3 border-b border-ocre/30">
+            <p class="text-sm font-semibold text-ocre">{{ error.type }}</p>
+            <p class="text-sm text-subtle mt-1">{{ error.message }}</p>
+        </div>
+        <pre class="text-xs text-subtle p-4 overflow-x-auto whitespace-pre-wrap font-mono">{{ error.traceback }}</pre>
+        <p class="text-xs text-faint px-4 pb-3">Détails affichés uniquement en mode développement (APP_ENV=dev).</p>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}
